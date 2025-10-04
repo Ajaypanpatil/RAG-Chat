@@ -67,6 +67,7 @@ Create a .env file in /backend:
 ```bash
 PORT=5000
 GEMINI_API_KEY=your_api_key_here
+TRANSFORMERS_CACHE=./model_cache
 ```
 
 Start backend:
