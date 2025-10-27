@@ -5,12 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup-model": "set TRANSFORMERS_CACHE=./model_cache && node src/setupModel.js",
-    "dev": "set TRANSFORMERS_CACHE=./model_cache && nodemon src/server.js",
-    "start": "set TRANSFORMERS_CACHE=./model_cache && node src/server.js",
-    "postinstall": "npm run setup-model"
-  },
+  "setup-model": "set TRANSFORMERS_CACHE=./model_cache && node src/setupModel.js",
+  "dev": "set TRANSFORMERS_CACHE=./model_cache && nodemon --config nodemon.json src/server.js",
+  "start": "set TRANSFORMERS_CACHE=./model_cache && node src/server.js",
+  "postinstall": "npm run setup-model"
+}
+,
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -24,7 +24,9 @@
     "express": "^5.1.0",
     "hnswlib-node": "^3.0.0",
     "langchain": "^0.3.31",
+    "lowdb": "^7.0.1",
     "multer": "^2.0.2",
+    "nanoid": "^5.1.6",
     "pdf-parse": "^1.1.1"
   },
   "devDependencies": {

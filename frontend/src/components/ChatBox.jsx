@@ -1,82 +1,84 @@
-import { useState, useRef, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import API_BASE from "../config/api.js";
+import { ask, getMessages } from "../lib/api";
 
-function ChatBox({ subject }) {
+export default function ChatBox({ chat }) {
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
-  const chatEndRef = useRef(null);
+  const endRef = useRef(null);
 
-  const askQuestion = async () => {
-    if (!question) return;
+  useEffect(() => {
+    async function load() {
+      if (!chat) return setMessages([]);
+      const { messages } = await getMessages(chat.id);
+      setMessages(messages);
+    }
+    load();
+  }, [chat?.id]);
 
-    const userMessage = { role: "user", text: question };
-    setMessages((prev) => [...prev, userMessage]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  async function send() {
+    if (!question.trim()) return;
+    const userMsg = { id: Date.now(), role: "user", text: question };
+    setMessages((m) => [...m, userMsg]);
     setQuestion("");
     setLoading(true);
-
     try {
-      const res = await axios.post(`${API_BASE}/ask`, {
-        subject,
-        question,
-      });
-      const botMessage = { role: "bot", text: res.data.answer };
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (err) {
-      console.error(err);
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", text: "Error getting answer" },
-      ]);
+      const { answer } = await ask(chat.id, userMsg.text);
+      setMessages((m) => [...m, { id: Date.now(), role: "bot", text: answer }]);
+    } catch {
+      setMessages((m) => [...m, { id: Date.now(), role: "bot", text: "Error getting answer" }]);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }
 
   return (
-    <div className="bg-white shadow-lg rounded-xl border border-gray-200 flex flex-col h-[70vh] w-full">
-      {/* Chat Messages */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50 rounded-t-xl">
-        {messages.map((m, idx) => (
+    <div className="flex flex-col h-full">
+      {/* Chat header */}
+      <div className="border-b bg-white px-5 py-3 text-gray-700 font-medium shadow-sm">
+        Chat: <span className="text-blue-600 font-semibold">{chat.name}</span>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-5 bg-gray-50 space-y-3">
+        {messages.map((m) => (
           <div
-            key={idx}
-            className={`mb-3 flex ${
-              m.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            key={m.id}
+            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`px-4 py-2 rounded-2xl max-w-3xl break-words shadow ${
+              className={`px-4 py-2 rounded-2xl max-w-lg break-words ${
                 m.role === "user"
                   ? "bg-blue-600 text-white rounded-br-none"
-                  : "bg-gray-100 text-gray-900 rounded-bl-none prose prose-sm"
+                  : "bg-white border rounded-bl-none"
               }`}
             >
               <ReactMarkdown>{m.text}</ReactMarkdown>
             </div>
           </div>
         ))}
-        <div ref={chatEndRef} />
+        <div ref={endRef} />
       </div>
 
-      {/* Input Bar */}
-      <div className="border-t bg-white p-3 flex gap-2 rounded-b-xl">
+      {/* Input bar */}
+      <div className="border-t bg-white p-3 flex gap-2">
         <input
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask a question..."
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onKeyDown={(e) => e.key === "Enter" && send()}
         />
         <button
-          onClick={askQuestion}
+          onClick={send}
           disabled={loading}
-          className="bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 disabled:bg-gray-400 transition-all"
+          className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
         >
           {loading ? "Thinking..." : "Ask"}
         </button>
@@ -84,5 +86,3 @@ function ChatBox({ subject }) {
     </div>
   );
 }
-
-export default ChatBox;
