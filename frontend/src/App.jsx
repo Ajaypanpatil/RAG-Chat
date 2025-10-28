@@ -29,12 +29,9 @@ function App() {
       {/* Main Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-72 bg-white border-r flex flex-col justify-between shadow-sm">
+        <aside className="w-72 bg-white border-r flex flex-col justify-between shadow-md">
           <div className="overflow-y-auto p-4 space-y-4">
             <ChatList selectedChat={selectedChat} onSelect={setSelectedChat} />
-          </div>
-          <div className="p-4 border-t bg-gray-50">
-            <FileUpload chat={selectedChat} />
           </div>
         </aside>
 

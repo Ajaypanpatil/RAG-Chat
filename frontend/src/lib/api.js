@@ -18,3 +18,18 @@ export const uploadPdf = (chatId, file) => {
     headers: { "Content-Type": "multipart/form-data" },
   }).then(r => r.data);
 };
+
+export async function deleteChat(chatId) {
+  const response = await fetch(`${API_BASE}/chats/${chatId}`, {
+    method: "DELETE",
+  });
+  
+  if (!response.ok) {
+    throw new Error("Failed to delete chat");
+  }
+  
+  const result = await response.json();
+  return result;
+}
+
+
