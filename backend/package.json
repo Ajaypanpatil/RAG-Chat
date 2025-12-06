@@ -5,16 +5,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-  "setup-model": "set TRANSFORMERS_CACHE=./model_cache && node src/setupModel.js",
-  "dev": "set TRANSFORMERS_CACHE=./model_cache && nodemon --config nodemon.json src/server.js",
-  "start": "set TRANSFORMERS_CACHE=./model_cache && node src/server.js",
-  "postinstall": "npm run setup-model"
-}
-,
+    "setup-model": "set TRANSFORMERS_CACHE=./model_cache && node src/setupModel.js",
+    "dev": "set TRANSFORMERS_CACHE=./model_cache && nodemon --config nodemon.json src/server.js",
+    "start": "set TRANSFORMERS_CACHE=./model_cache && node src/server.js",
+    "postinstall": "npm run setup-model"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.31.0",
     "@huggingface/transformers": "^3.7.2",
     "@langchain/community": "^0.3.53",
     "@langchain/google-genai": "^0.2.16",
